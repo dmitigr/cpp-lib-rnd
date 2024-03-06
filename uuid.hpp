@@ -21,6 +21,7 @@
 #include "number.hpp"
 
 #include <algorithm>
+#include <array>
 #include <cstdint>
 #include <cstdio>
 #include <limits>
@@ -33,6 +34,15 @@ class Uuid final {
 public:
   /// Constructs Nil UUID.
   Uuid() = default;
+
+  /// An alias of raw representation type.
+  using Raw = std::array<unsigned char, 16>;
+
+  /// Constructs UUID by using a raw representation.
+  Uuid(const Raw& raw)
+  {
+    data_.raw_ = raw;
+  }
 
   /**
    * @returns The random UUID (version 4).
@@ -88,6 +98,12 @@ public:
     return std::string{buf, buf_size};
   }
 
+  /// @returns The raw representation of the UUID.
+  const Raw& raw() const noexcept
+  {
+    return data_.raw_;
+  }
+
 private:
   union {
     struct {
@@ -98,7 +114,7 @@ private:
       std::uint8_t clock_seq_low_;
       std::uint8_t node_[6];
     } rep_;
-    unsigned char raw_[16]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    Raw raw_{};
   } data_;
 
   bool is_invariant_ok() const noexcept
